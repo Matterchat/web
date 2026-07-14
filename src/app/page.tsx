@@ -1,3 +1,9 @@
+"use client";
+
+import { useConfig } from "@/hooks/useConfig";
+
 export default function Page() {
-  return <p>Hello</p>;
+  const config = useConfig();
+
+  return <p>{JSON.stringify(config)}</p>;
 }
