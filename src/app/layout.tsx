@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { ConfigurationProvider } from "@/providers/ConfigurationProvider";
+import { cn } from "@/lib/utils";
+
+const manropeHeading = Manrope({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -21,7 +29,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} h-full antialiased`}
+      className={cn(
+        "h-full",
+        "dark",
+        "antialiased",
+        plusJakartaSans.variable,
+        "font-sans",
+        inter.variable,
+        manropeHeading.variable,
+      )}
     >
       <body className="min-h-full flex flex-col">
         <ConfigurationProvider>{children}</ConfigurationProvider>
