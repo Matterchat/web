@@ -1,7 +1,9 @@
 import {
   ApiVersion,
   CreateWorkspaceBodyDto,
+  CreateWorkspaceChannelDto,
   UserModelDto,
+  WorkspaceChannelModelDto,
   WorkspaceModelDto,
 } from "@matterchat/contracts";
 import { ApiClient } from "./client";
@@ -23,5 +25,32 @@ export class API {
       ),
     list: async () =>
       await ApiClient.get<WorkspaceModelDto[]>(ApiVersion.v1, "/workspaces"),
+    id: (workspaceId: string) => ({
+      get: async () =>
+        await ApiClient.get<WorkspaceModelDto>(
+          ApiVersion.v1,
+          `/workspaces/${workspaceId}`,
+        ),
+      channels: {
+        create: async (body: CreateWorkspaceChannelDto) =>
+          await ApiClient.post<WorkspaceModelDto, CreateWorkspaceChannelDto>(
+            ApiVersion.v1,
+            `/workspaces/${workspaceId}/channels`,
+            body,
+          ),
+        list: async () =>
+          await ApiClient.get<WorkspaceChannelModelDto[]>(
+            ApiVersion.v1,
+            `/workspaces/${workspaceId}/channels`,
+          ),
+        id: (channelId: string) => ({
+          get: async () =>
+            await ApiClient.get<WorkspaceChannelModelDto>(
+              ApiVersion.v1,
+              `/workspaces/${workspaceId}/channels/${channelId}`,
+            ),
+        }),
+      },
+    }),
   };
 }
