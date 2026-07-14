@@ -1,4 +1,3 @@
-import { WebConfiguration } from "@matterchat/config";
 import axios from "axios";
 
 export const api = axios.create();
@@ -8,8 +7,10 @@ api.interceptors.request.use(
     const isServer = typeof window === "undefined";
 
     if (isServer) {
-      if (!config.baseURL) config.baseURL = WebConfiguration.addresses.api;
-
+      if (!config.baseURL) {
+        const { WebConfiguration } = await import("@matterchat/config");
+        config.baseURL = WebConfiguration.addresses.api;
+      }
       // Add session token
       try {
         const { auth } = await import("@/auth");

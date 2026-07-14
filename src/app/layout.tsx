@@ -3,6 +3,8 @@ import { Plus_Jakarta_Sans, Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { ConfigurationProvider } from "@/providers/ConfigurationProvider";
 import { cn } from "@/lib/utils";
+import { QueryProvider } from "@/providers/QueryProvider";
+import { ToastContainer } from "react-toastify";
 
 const manropeHeading = Manrope({
   subsets: ["latin"],
@@ -40,7 +42,10 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <ConfigurationProvider>{children}</ConfigurationProvider>
+        <ConfigurationProvider>
+          <QueryProvider>{children}</QueryProvider>
+          <ToastContainer theme="dark" position="bottom-right" />
+        </ConfigurationProvider>
       </body>
     </html>
   );
