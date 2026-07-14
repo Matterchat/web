@@ -1,13 +1,14 @@
-import { WebConfiguration } from "@matterchat/config";
+import { WebConfiguration, IWebConfiguration } from "@matterchat/config";
 import { create } from "zustand";
 
 export interface IConfigState {
-  configuration: WebConfiguration;
-  setConfiguration: (configuration: WebConfiguration) => void;
+  configuration: IWebConfiguration;
+  setConfiguration: (configuration: IWebConfiguration) => void;
 }
 
 export const useConfigState = create<IConfigState>((set) => ({
-  configuration: {},
+  configuration: {} as IWebConfiguration,
 
-  setConfiguration: (configuration: WebConfiguration) => set({ configuration }),
+  setConfiguration: (configuration: IWebConfiguration) =>
+    set({ configuration }),
 }));
