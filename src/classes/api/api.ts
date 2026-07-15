@@ -2,6 +2,7 @@ import {
   ApiVersion,
   CreateWorkspaceBodyDto,
   CreateWorkspaceChannelDto,
+  GatewayTicketResponseDto,
   UserModelDto,
   WorkspaceChannelModelDto,
   WorkspaceModelDto,
@@ -52,5 +53,13 @@ export class API {
         }),
       },
     }),
+  };
+
+  static readonly gateway = {
+    requestTicket: async () =>
+      await ApiClient.get<GatewayTicketResponseDto>(
+        ApiVersion.v1,
+        "/gateway/ticket",
+      ),
   };
 }

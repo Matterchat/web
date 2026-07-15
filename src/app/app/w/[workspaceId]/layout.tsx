@@ -1,4 +1,5 @@
 import { API } from "@/classes/api/api";
+import { GatewayProvider } from "@/providers/GatewayProvider";
 import {
   dehydrate,
   HydrationBoundary,
@@ -31,7 +32,7 @@ export default async function Layout(
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      {props.children}
+      <GatewayProvider>{props.children}</GatewayProvider>
     </HydrationBoundary>
   );
 }

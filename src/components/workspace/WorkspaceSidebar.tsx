@@ -37,19 +37,19 @@ export function WorkspaceSidebar(props: IWorkspaceSidebarProps) {
   });
 
   if (isLoading) return <LoadingSplash />;
-  if (error)
+  if (error || !data)
     return (
       <ErrorSplash
         title="Failed to load workspace"
-        message={error.message || "An unknown error occurred"}
+        message={error?.message || "An unknown error occurred"}
       />
     );
 
   return (
     <div className="w-80 h-full border-r border-border p-6 flex flex-col gap-4">
-      <p className="font-bold text-xl">{data!.name}</p>
+      <p className="font-bold text-xl">{data.name}</p>
       <div className="flex flex-col gap-2 w-full">
-        <CreateChannelButton workspaceId={data!.id} />
+        <CreateChannelButton workspaceId={data.id} />
         <WorkspaceSidebarChannelList
           workspaceId={data!.id}
           activeChannelId={props.activeChannelId}

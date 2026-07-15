@@ -1,3 +1,4 @@
+import { ChatWindow } from "@/components/chat/ChatWindow";
 import { AppShell } from "@/components/shell/AppShell";
 import { ChannelHeader } from "@/components/workspace/channel/ChannelHeader";
 import { WorkspaceSidebar } from "@/components/workspace/WorkspaceSidebar";
@@ -19,6 +20,7 @@ export default async function Page(props: {
         />
         <div className="h-full flex flex-col grow">
           <ChannelHeader workspaceId={workspaceId} channelId={channelId} />
+          <ChatWindow />
         </div>
       </div>
     </AppShell>
