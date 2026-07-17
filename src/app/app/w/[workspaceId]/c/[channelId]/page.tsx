@@ -20,7 +20,7 @@ export default async function Page(props: {
         />
         <div className="h-full flex flex-col grow">
           <ChannelHeader workspaceId={workspaceId} channelId={channelId} />
-          <ChatWindow />
+          <ChatWindow workspaceId={workspaceId} channelId={channelId} />
         </div>
       </div>
     </AppShell>

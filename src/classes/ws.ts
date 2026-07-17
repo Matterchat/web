@@ -68,4 +68,11 @@ export class Websocket {
     const listeners = this.#eventListeners.get(event);
     if (listeners) listeners.forEach((callback) => callback(data));
   }
+
+  emit(event: GatewayEvent, data: any) {
+    if (this.#destroyed) throw new Error("WebSocket is destroyed.");
+
+    const message = JSON.stringify({ event, data });
+    this.#socket.send(message);
+  }
 }

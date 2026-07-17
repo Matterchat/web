@@ -3,6 +3,7 @@ import {
   CreateWorkspaceBodyDto,
   CreateWorkspaceChannelDto,
   GatewayTicketResponseDto,
+  MessageModelDto,
   UserModelDto,
   WorkspaceChannelModelDto,
   WorkspaceModelDto,
@@ -50,6 +51,14 @@ export class API {
               ApiVersion.v1,
               `/workspaces/${workspaceId}/channels/${channelId}`,
             ),
+
+          messages: {
+            list: async (limit: number, offset: number) =>
+              await ApiClient.get<MessageModelDto[]>(
+                ApiVersion.v1,
+                `/workspaces/${workspaceId}/channels/${channelId}/messages?limit=${limit}&offset=${offset}`,
+              ),
+          },
         }),
       },
     }),

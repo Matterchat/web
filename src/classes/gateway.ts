@@ -8,6 +8,7 @@ export class Gateway {
 
   #isConnected = false;
   #readyCallbacks: (() => void)[] = [];
+  #closedCallbacks: (() => void)[] = [];
 
   constructor(gatewayAddress: string) {
     this.requestTicket().then((ticket) => {
@@ -45,6 +46,7 @@ export class Gateway {
 
     this.#ws?.close();
     this.#destroyed = true;
+    this.#closedCallbacks.forEach((callback) => callback());
   }
 
   public get on() {
@@ -52,10 +54,22 @@ export class Gateway {
     return this.#ws.on.bind(this.#ws);
   }
 
+  public emit(event: GatewayEvent, data: any) {
+    if (!this.#ws) throw new Error("WebSocket is not initialized yet.");
+    this.#ws.emit(event, data);
+  }
+
   public onceReady(callback: () => void) {
     if (this.#ws) callback();
     else {
       this.#readyCallbacks.push(callback);
+    }
+  }
+
+  public onceClosed(callback: () => void) {
+    if (this.#destroyed) callback();
+    else {
+      this.#closedCallbacks.push(callback);
     }
   }
 }
