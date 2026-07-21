@@ -68,7 +68,25 @@ export class API {
           },
         }),
       },
+      invites: {
+        create: async () =>
+          await ApiClient.post<{ id: string }, {}>(
+            ApiVersion.v1,
+            `/workspaces/${workspaceId}/invites`,
+            {},
+          ),
+      },
     }),
+    invites: {
+      id: (inviteId: string) => ({
+        accept: async () =>
+          await ApiClient.post<WorkspaceModelDto, {}>(
+            ApiVersion.v1,
+            `/workspaces/invites/${inviteId}/accept`,
+            {},
+          ),
+      }),
+    },
   };
 
   static readonly gateway = {

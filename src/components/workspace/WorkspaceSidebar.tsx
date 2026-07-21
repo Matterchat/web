@@ -6,7 +6,12 @@ import { LoadingSplash } from "../splash/LoadingSplash";
 import { ErrorSplash } from "../splash/ErrorSplash";
 import { API } from "@/classes/api/api";
 import { Button, buttonVariants } from "../ui/button";
-import { LucideHash, LucidePlus } from "lucide-react";
+import {
+  LucideHash,
+  LucideLink,
+  LucideMoreHorizontal,
+  LucidePlus,
+} from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -24,6 +29,19 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 interface IWorkspaceSidebarProps {
   workspaceId: string;
@@ -31,6 +49,8 @@ interface IWorkspaceSidebarProps {
 }
 
 export function WorkspaceSidebar(props: IWorkspaceSidebarProps) {
+  const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+
   const { isLoading, data, error } = useQuery({
     queryKey: ["workspace", props.workspaceId],
     queryFn: () => API.workspaces.id(props.workspaceId).get(),
@@ -47,14 +67,51 @@ export function WorkspaceSidebar(props: IWorkspaceSidebarProps) {
 
   return (
     <div className="w-80 h-full border-r border-border p-6 flex flex-col gap-4">
-      <p className="font-bold text-xl">{data.name}</p>
+      <div className="flex flex-row items-center justify-between">
+        <p className="font-bold text-xl">{data.name}</p>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button size="icon-sm" variant="ghost">
+                <LucideMoreHorizontal />
+              </Button>
+            }
+          />
+          <DropdownMenuContent className="w-40" align="start">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Members</DropdownMenuLabel>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <LucidePlus /> Invite
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <InviteCopyLinkWorkspaceItem workspace={data} />
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Channels</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setIsCreateChannelOpen(true)}>
+                <LucidePlus /> Create channel
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="flex flex-col gap-2 w-full">
-        <CreateChannelButton workspaceId={data.id} />
         <WorkspaceSidebarChannelList
           workspaceId={data!.id}
           activeChannelId={props.activeChannelId}
         />
       </div>
+      <CreateChannelDialog
+        workspaceId={data.id}
+        open={isCreateChannelOpen}
+        onOpenChange={setIsCreateChannelOpen}
+      />
     </div>
   );
 }
@@ -107,14 +164,14 @@ export function WorkspaceSidebarChannelList(
   );
 }
 
-interface ICreateChannelButtonProps {
+interface ICreateChannelDialogProps {
   workspaceId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-function CreateChannelButton(props: ICreateChannelButtonProps) {
+function CreateChannelDialog(props: ICreateChannelDialogProps) {
   const router = useRouter();
-
-  const [isOpen, setIsOpen] = useState(false);
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["workspaces.channels.create", props.workspaceId],
@@ -123,7 +180,7 @@ function CreateChannelButton(props: ICreateChannelButtonProps) {
         name: data.get("name") as string,
       }),
     onSuccess: (data) => {
-      setIsOpen(false);
+      props.onOpenChange(false);
       router.push(`/app/w/${props.workspaceId}/c/${data.id}`);
     },
     onError: (error) => {
@@ -132,15 +189,7 @@ function CreateChannelButton(props: ICreateChannelButtonProps) {
   });
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
-      <DialogTrigger
-        render={
-          <Button className="w-full" variant={"outline"}>
-            <LucidePlus className="mr-2" /> Create channel{" "}
-            <span className="ml-2"></span>
-          </Button>
-        }
-      />
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogContent>
         <form
           className="grid gap-6"
@@ -167,5 +216,33 @@ function CreateChannelButton(props: ICreateChannelButtonProps) {
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface IInviteCopyLinkWorkspaceItemProps {
+  workspace: WorkspaceModelDto;
+}
+
+export function InviteCopyLinkWorkspaceItem(
+  props: IInviteCopyLinkWorkspaceItemProps,
+) {
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["workspaces.invites.create", props.workspace.id],
+    mutationFn: () => API.workspaces.id(props.workspace.id).invites.create(),
+    onSuccess: (data) => {
+      navigator.clipboard.writeText(
+        `${window.location.origin}/app/i/${data.id}`,
+      );
+      toast.success("Invite link copied to clipboard");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return (
+    <DropdownMenuItem onClick={() => mutate()} disabled={isPending}>
+      <LucideLink /> Copy invite link
+    </DropdownMenuItem>
   );
 }
