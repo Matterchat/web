@@ -5,6 +5,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { LucideAtSign } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page() {
   const user = await API.users.id("@me").get();
   const workspaces = await API.workspaces.list();

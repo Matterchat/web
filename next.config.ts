@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     root: path.join(process.cwd(), "../.."),
   },
   devIndicators: false,
+  output: "standalone",
 };
 
 export default nextConfig;
