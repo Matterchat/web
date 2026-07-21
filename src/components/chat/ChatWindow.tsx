@@ -42,7 +42,7 @@ export function ChatWindow(props: IChatWindowProps) {
     );
 
   return (
-    <div className="flex grow flex-col">
+    <div className="flex flex-col flex-1 min-h-0">
       <ChatMessageList
         messagingCore={messagingCore.current}
         workspaceId={props.workspaceId}
