@@ -33,6 +33,13 @@ export class API {
           ApiVersion.v1,
           `/workspaces/${workspaceId}`,
         ),
+      members: {
+        list: async () =>
+          await ApiClient.get<UserModelDto[]>(
+            ApiVersion.v1,
+            `/workspaces/${workspaceId}/members`,
+          ),
+      },
       channels: {
         create: async (body: CreateWorkspaceChannelDto) =>
           await ApiClient.post<WorkspaceModelDto, CreateWorkspaceChannelDto>(

@@ -12,6 +12,7 @@ interface IChatMessageListProps {
   messagingCore: MessagingCore;
   workspaceId: string;
   channelId: string;
+  users: UserModel[];
 }
 
 export function ChatMessageList(props: IChatMessageListProps) {
@@ -78,7 +79,7 @@ export function ChatMessageList(props: IChatMessageListProps) {
   return (
     <div className="flex grow flex-col">
       {data.map((msg, i) => (
-        <ChatMessage key={i} message={msg} />
+        <ChatMessage key={i} message={msg} users={props.users} />
       ))}
     </div>
   );

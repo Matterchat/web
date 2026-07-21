@@ -26,6 +26,11 @@ export default async function Layout(
       API.workspaces.id(params.workspaceId).channels.id(params.channelId).get(),
   });
 
+  await queryClient.prefetchQuery({
+    queryKey: ["workspace", params.workspaceId, "members"],
+    queryFn: () => API.workspaces.id(params.workspaceId).members.list(),
+  });
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       {props.children}
