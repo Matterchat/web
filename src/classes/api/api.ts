@@ -15,7 +15,21 @@ export class API {
     id: (userId: string) => ({
       get: async () =>
         await ApiClient.get<UserModelDto>(ApiVersion.v1, `/users/${userId}`),
+      uploadAvatar: async (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        return await ApiClient.post<UserModelDto, FormData>(
+          ApiVersion.v1,
+          `/users/${userId}/avatar`,
+          formData,
+        );
+      },
     }),
+    presence: {
+      confirm: async () =>
+        await ApiClient.post<{}, {}>(ApiVersion.v1, "/users/presence", {}),
+    },
   };
 
   static readonly workspaces = {
