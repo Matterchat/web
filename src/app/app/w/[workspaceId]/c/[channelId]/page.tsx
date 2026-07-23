@@ -21,7 +21,7 @@ export default async function Page(props: {
         />
         <div className="h-full flex flex-col grow">
           <ChannelHeader workspaceId={workspaceId} channelId={channelId} />
-          <div className="flex flex-row grow">
+          <div className="flex flex-row grow min-h-0">
             <ChatWindow workspaceId={workspaceId} channelId={channelId} />
             <MemberList workspaceId={workspaceId} />
           </div>
