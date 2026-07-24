@@ -4,17 +4,19 @@ import {
   UserModel,
 } from "@matterchat/contracts";
 import { UserAvatar } from "../user/UserAvatar";
+import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 
 interface IChatMessageProps {
   message: MessageModelDto;
-  users: UserModel[];
 }
 
 export function ChatMessage(props: IChatMessageProps) {
-  const sender = props.users.find((u) => u.id === props.message.userId);
+  const users = useWorkspaceMembers();
+
+  const sender = users.find((u) => u.id === props.message.userId);
   const isOnline =
     sender &&
-    new Date().getTime() - new Date(sender.lastSeen).getTime() < 12000; // 10 seconds + 2 seconds buffer
+    new Date().getTime() - new Date(sender.lastSeen).getTime() < 20000; // 10 seconds + 10 seconds buffer
 
   return (
     <div className="flex flex-row gap-4 px-8 py-2">
@@ -25,9 +27,7 @@ export function ChatMessage(props: IChatMessageProps) {
         className="mt-1"
       />
       <div className="flex flex-col">
-        <p className="font-bold">
-          {props.users.find((u) => u.id === props.message.userId)?.fullName}
-        </p>
+        <p className="font-bold">{sender?.fullName}</p>
         <p>{props.message.content}</p>
       </div>
     </div>

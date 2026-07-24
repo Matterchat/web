@@ -12,12 +12,12 @@ import { LoadingSplash } from "../splash/LoadingSplash";
 import { ErrorSplash } from "../splash/ErrorSplash";
 import { queryClient } from "@/providers/QueryProvider";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { useWorkspaceMembers } from "@/hooks/useWorkspaceMembers";
 
 interface IChatMessageListProps {
   messagingCore: MessagingCore;
   workspaceId: string;
   channelId: string;
-  users: UserModel[];
 }
 
 export function ChatMessageList(props: IChatMessageListProps) {
@@ -216,7 +216,7 @@ export function ChatMessageList(props: IChatMessageListProps) {
                   {hasNextPage ? "Loading..." : "No more messages"}
                 </div>
               ) : (
-                <ChatMessage message={msg} users={props.users} />
+                <ChatMessage message={msg} />
               )}
             </div>
           );

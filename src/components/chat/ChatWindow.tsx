@@ -20,11 +20,6 @@ export function ChatWindow(props: IChatWindowProps) {
   const isConnected = useGatewayState((state) => state.isConnected);
   const messagingCore = useRef<MessagingCore>(MessagingCore.getInstance());
 
-  const { data, isPending, error } = useQuery({
-    queryKey: ["workspace", props.workspaceId, "members"],
-    queryFn: () => API.workspaces.id(props.workspaceId).members.list(),
-  });
-
   useEffect(() => {
     messagingCore.current.setGateway(gateway);
   }, [gateway, messagingCore]);
@@ -35,19 +30,12 @@ export function ChatWindow(props: IChatWindowProps) {
     messagingCore.current.setChannelId(props.channelId);
   }, [props.channelId, isConnected, messagingCore]);
 
-  if (isPending || !data) return <LoadingSplash />;
-  if (error)
-    return (
-      <ErrorSplash title="Failed to fetch members" message={error.message} />
-    );
-
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <ChatMessageList
         messagingCore={messagingCore.current}
         workspaceId={props.workspaceId}
         channelId={props.channelId}
-        users={data}
       />
       <ChatInput messagingCore={messagingCore.current} />
     </div>

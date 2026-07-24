@@ -1,5 +1,6 @@
 import { API } from "@/classes/api/api";
 import { GatewayProvider } from "@/providers/GatewayProvider";
+import { WorkspaceMembersProvider } from "@/providers/WorkspaceMembersProvider";
 import {
   dehydrate,
   HydrationBoundary,
@@ -26,13 +27,22 @@ export default async function Layout(
   });
 
   await queryClient.prefetchQuery({
+    queryKey: ["workspace", params.workspaceId, "members"],
+    queryFn: () => API.workspaces.id(params.workspaceId).members.list(),
+  });
+
+  await queryClient.prefetchQuery({
     queryKey: ["workspace", params.workspaceId, "channels"],
     queryFn: () => API.workspaces.id(params.workspaceId).channels.list(),
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <GatewayProvider>{props.children}</GatewayProvider>
+      <GatewayProvider>
+        <WorkspaceMembersProvider workspaceId={params.workspaceId}>
+          {props.children}
+        </WorkspaceMembersProvider>
+      </GatewayProvider>
     </HydrationBoundary>
   );
 }
