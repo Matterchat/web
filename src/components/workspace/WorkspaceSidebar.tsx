@@ -7,6 +7,8 @@ import { ErrorSplash } from "../splash/ErrorSplash";
 import { API } from "@/classes/api/api";
 import { Button, buttonVariants } from "../ui/button";
 import {
+  LucideBuilding,
+  LucideBuilding2,
   LucideHash,
   LucideLink,
   LucideMoreHorizontal,
@@ -26,7 +28,7 @@ import { Field, FieldGroup } from "../ui/field";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
@@ -42,6 +44,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { queryClient } from "@/providers/QueryProvider";
 
 interface IWorkspaceSidebarProps {
   workspaceId: string;
@@ -50,11 +53,14 @@ interface IWorkspaceSidebarProps {
 
 export function WorkspaceSidebar(props: IWorkspaceSidebarProps) {
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+  const [isCreateOfficeOpen, setIsCreateOfficeOpen] = useState(false);
 
   const { isLoading, data, error } = useQuery({
     queryKey: ["workspace", props.workspaceId],
     queryFn: () => API.workspaces.id(props.workspaceId).get(),
   });
+
+  const path = usePathname();
 
   if (isLoading) return <LoadingSplash />;
   if (error || !data)
@@ -97,6 +103,9 @@ export function WorkspaceSidebar(props: IWorkspaceSidebarProps) {
               <DropdownMenuItem onClick={() => setIsCreateChannelOpen(true)}>
                 <LucidePlus /> Create channel
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsCreateOfficeOpen(true)}>
+                <LucidePlus /> Create office
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -106,11 +115,33 @@ export function WorkspaceSidebar(props: IWorkspaceSidebarProps) {
           workspaceId={data!.id}
           activeChannelId={props.activeChannelId}
         />
+        <Link
+          className={buttonVariants({
+            variant:
+              path == `/app/w/${props.workspaceId}/offices`
+                ? "secondary"
+                : "ghost",
+            size: "sm",
+            className: "justify-start",
+          })}
+          onClick={(e) => {
+            if (path == `/app/w/${props.workspaceId}/offices`)
+              e.preventDefault();
+          }}
+          href={`/app/w/${props.workspaceId}/offices`}
+        >
+          <LucideBuilding className="inline size-4" /> Offices
+        </Link>
       </div>
       <CreateChannelDialog
         workspaceId={data.id}
         open={isCreateChannelOpen}
         onOpenChange={setIsCreateChannelOpen}
+      />
+      <CreateOfficeDialog
+        workspaceId={data.id}
+        open={isCreateOfficeOpen}
+        onOpenChange={setIsCreateOfficeOpen}
       />
     </div>
   );
@@ -205,6 +236,64 @@ function CreateChannelDialog(props: ICreateChannelDialogProps) {
             <Field>
               <Label htmlFor="name">Name</Label>
               <Input id="name" name="name" placeholder="Channel name" />
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline">Cancel</Button>} />
+            <Button type="submit" disabled={isPending}>
+              Create
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface ICreateOfficeDialogProps {
+  workspaceId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+function CreateOfficeDialog(props: ICreateOfficeDialogProps) {
+  const router = useRouter();
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["workspaces.offices.create", props.workspaceId],
+    mutationFn: (data: FormData) =>
+      API.workspaces.id(props.workspaceId).offices.create({
+        name: data.get("name") as string,
+      }),
+    onSuccess: (data) => {
+      props.onOpenChange(false);
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", props.workspaceId, "offices"],
+      });
+      router.push(`/app/w/${props.workspaceId}/offices`);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return (
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent>
+        <form
+          className="grid gap-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            mutate(new FormData(e.currentTarget));
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>New office</DialogTitle>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" name="name" placeholder="Office name" />
             </Field>
           </FieldGroup>
           <DialogFooter>
