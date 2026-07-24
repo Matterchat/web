@@ -2,11 +2,14 @@ import {
   ApiVersion,
   CreateWorkspaceBodyDto,
   CreateWorkspaceChannelDto,
+  CreateWorkspaceOfficeDto,
   GatewayTicketResponseDto,
   MessageModelDto,
+  OfficeTokenResponseDto,
   UserModelDto,
   WorkspaceChannelModelDto,
   WorkspaceModelDto,
+  WorkspaceOfficeModelDto,
 } from "@matterchat/contracts";
 import { ApiClient } from "./client";
 
@@ -89,6 +92,25 @@ export class API {
             `/workspaces/${workspaceId}/invites`,
             {},
           ),
+      },
+      offices: {
+        list: async () =>
+          await ApiClient.get<WorkspaceOfficeModelDto[]>(
+            ApiVersion.v1,
+            `/workspaces/${workspaceId}/offices`,
+          ),
+        create: async (body: CreateWorkspaceOfficeDto) =>
+          await ApiClient.post<
+            WorkspaceOfficeModelDto,
+            CreateWorkspaceOfficeDto
+          >(ApiVersion.v1, `/workspaces/${workspaceId}/offices`, body),
+        id: (officeId: string) => ({
+          getToken: async () =>
+            await ApiClient.get<OfficeTokenResponseDto>(
+              ApiVersion.v1,
+              `/workspaces/${workspaceId}/offices/${officeId}/token`,
+            ),
+        }),
       },
     }),
     invites: {
